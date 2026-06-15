@@ -1,0 +1,98 @@
+###1. Create a Pod named nginx-pod using image nginx:1.25. 
+   Constraints
+    Namespace: dev
+    Container name: web
+    Port: 80
+    Label: app=frontend
+
+###Ans: 
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dev
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod
+  namespace: dev
+  labels:
+    app: frontend
+spec:
+  containers:
+  - name: web
+    image: nginx:1.25
+    ports:
+    - containerPort: 80
+
+kubectl create namespace dev
+kubectl run nginx-pod \
+  --image=nginx:1.25 \
+  --namespace=dev \
+  --port=80 \
+  --labels=app=frontend
+
+
+###2. Create a ReplicaSet named rs-nginx with 3 replicas.
+   Constraints
+     Image: nginx:1.25
+     Label: app=web
+     Container name: nginx-container
+
+###Ans: 
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: rs-nginx
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+      - name: nginx-container
+        image: nginx:1.25
+
+Imperative Not recommended / not supported properly
+
+###3. Scale ReplicaSet to 5 replicas (imperative only)
+
+Ans:
+kubectl scale rs rs-nginx --replicas=5
+
+Verification
+kubectl get rs rs-nginx
+kubectl get pods -l app=web
+
+
+###4. Update image to nginx:1.26 (imperative)
+Ans:
+kubectl edit rs rs-nginx
+
+
+###5. Create multi-container Pod
+   Constraints
+      nginx container
+      busybox container (sleep 3600)
+      Label: type=multi
+###Ans:
+apiVersion: v1
+kind: Pod
+metadata: 
+   name: multi-container-pod
+   labels:
+     type: multi
+spec: 
+   containers:
+      - name: nginx
+        image: nginx
+      - name: busybox
+        image: busybox
+        command: ["sleep","3600"]
+
+Imperative Not properly possible (multi-container not supported via kubectl run)

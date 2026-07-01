@@ -300,5 +300,112 @@ Constraints
 Ans: 
 kubectl delete pod web-sts-1
 kubectl get pods -l app=web -w
+
+###16. Create a DaemonSet named ds-nginx.
+
+Constraints
+  Image: nginx
+  Label: app=daemon
+  Container name: nginx
+
+Ans: 
+apiVersion: apps/v1 
+kind: DaemonSet 
+metadata: 
+    name: ds-nginx 
+spec: 
+   seletor: 
+     matchLabels: 
+	    app: daemon 
+   template: 
+    metadata: 
+	       labels: 
+		     app: daemon
+        spec: 
+	     containers: 
+		   - name: nginx 
+             image: nginx 
+            		  
+
+
+###17. Ensure DaemonSet runs only on worker nodes.
+
+Constraints
+  Use nodeSelector
+  Assume label: node-type=worker
+Ans: 
+apiVersion: apps/v1 
+kind: DaemonSet 
+metadata: 
+     name: ds-nginx
+spec: 
+    selector: 
+	  matchLabels: 
+	     app: daemon  
+    template:
+       matadata: 
+           labels: 
+             app: daemon  
+	   spec:
+	      node Selector: 
+               node-type: worker 
+          containers: 
+              - name: nginx 
+                image: nginx
+            
+
+
+kubectl label nodes node_v2 node-type=worker 				  
+		 
+	
+
+18.Update DaemonSet image to nginx:1.26.
+
+Constraints
+  Use imperative
+  Observe rollout behavior
+Ans: 
+kubectl set daemonset ds-nginx nginx=nginx:1.26 
+kubectl rollout status ds ds-nginx -n default 
+kubectl get daemonset ds-daemon -o wide
+
+19. Add resource limits to DaemonSet.
+
+Constraints
+  CPU: 100m
+  Memory: 128Mi
+
+Ans: 
+apiVersion: apps/v1 
+kind: DaemonSet 
+metadata: 
+    name: ds-nginx 
+spec: 
+    selector: 
+	   matchLabels: 
+	      app: daemon 
+	template: 
+	    metadata: 
+	     labels: 
+		   app: daemon 
+		spec: 
+		  containers:
+		   - name: nginx 
+		     image: nginx 
+			 resources:
+			   limits:
+			    cpu: "100m"
+			    memory: "128Mi" 
+
+
+20. Verify DaemonSet scheduling.
+
+Constraints
+  Show how many pods are running
+  Match with number of nodes
+
+Ans:
+kubectl get pods -n default 
+kubectl get nodes -l node-type=worker 
             
 

@@ -407,5 +407,159 @@ Constraints
 Ans:
 kubectl get pods -n default 
 kubectl get nodes -l node-type=worker 
+
+
+21. Create a Pod named affinity-pod.
+
+Constraints
+  Image: nginx
+  Schedule only on nodes with label: disktype=ssd
+  Use nodeAffinity (requiredDuringSchedulingIgnoredDuringExecution)
+
+Ans: 
+apiVersion: v1 
+kind: Pod 
+metadata: 
+   name: affinity-pod
+spec: 
+   affinity:
+      nodeAffinity:
+	    requiredDuringSchedulingIgnoredDuringExecution: 
+		   nodeSelectorTerms: 
+		    - matchExpressions: 
+			     key: disktype 
+				 operator: In 
+				 values: 
+				    - ssd 
+   containers:
+     -  name: nginx 
+	    image: nginx 
+
+kubectl label nodes node_name disktype=ssd 
+
+22. Modify a Deployment nginx-deploy to prefer nodes with label zone=us-east.
+
+Constraints
+  Use preferredDuringSchedulingIgnoredDuringExecution
+  Weight: 1
+
+Ans: 
+apiVersion: apps/v1 
+kind: Deployment
+metadata: 
+     name: nginx-deploy 
+spec: 
+   replicas: 3 
+   selector: 
+      matchLabels: 
+	      app: nginx 
+   template:
+      metadata: 
+	     labels: 
+		  app: nginx 
+      spec: 
+	     affinity: 
+		    preferredDuringSchedulingIgnoredDuringExecution:
+			   - weight: 80
+                  preference:
+			       matchExpressions:
+				    - key: zone
+					  operator: In 
+					  values: 
+					    - us-east
+         containers: 	
+              - name: nginx 
+                image: nginx 			  
+
+
+
+23. Create a Pod that runs only if another Pod with label app=web exists on the same node.
+
+Constraints
+  Use podAffinity
+  Topology key: kubernetes.io/hostname
+
+Ans: 
+apiVersion: v1 
+kind: Pod 
+metadata: 
+   name: nginx 
+spec: 
+   affinity: 
+     podAffinity: 
+	  requiredDuringSchedulingIgnoredDuringExecution:
+	   - labelSelector: 
+	      matchExpressions:
+		    - key: app 
+			  operator: In 
+			  values: 
+			     - web 
+	     topologyKey: "kubernetes.io/hostname"
+	containers:
+	   - name: nginx 
+	     image: nginx 
+
+
+
+24. Create a Pod that must NOT run on nodes where Pods with label app=db are running.
+
+Constraints
+  Use podAntiAffinity
+  Required rule
+
+Ans: 
+apiVersion: v1 
+kind: Pod 
+metadata: 
+    name: nginx 
+spec: 
+   affinity: 
+      podAntiAffinity: 
+	    requiredDuringSchedulingIgnoredDuringExecution:
+		  - labelSelector: 
+		      matchLabels: 
+			     app: db 
+              topologyKey: "kubernetes.io/hostname"
+   containers:
+       - name: nginx
+	     image: nginx 
+
+25. Modify a Deployment to spread Pods across nodes.
+
+Constraints
+  Use podAntiAffinity
+  Ensure replicas do NOT land on same node
+  Label: app=nginx
+
+Ans: 
+apiVersion: apps/v1 
+kind: Deployment 
+metadata: 
+   name: nginx-deploy 
+spec: 
+   replicas: 3 
+   selector:
+      matchLabels: 
+	     app: nginx 
+   template: 
+      metadata: 
+	      labels:
+		     app: nginx 
+	  spec:
+           affinity: 
+	          podAntiAffinity:
+	     	   requiredDuringSchedulingIgnoredDuringExecution:
+	     	    - labelSelector:
+	     	        matchExpressions:
+	     			 - key: app 
+	     			   operator: In 
+	     			   values: 
+	     			     - nginx 
+	      		  topologyKey: kubernetes.io/hostname
+	       
+           containers:
+	            - name: nginx 
+	     	     image: nginx
+	     		       
             
 

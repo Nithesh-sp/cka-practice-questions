@@ -643,5 +643,128 @@ Scenario
 Node tainted: env=prod:NoSchedule
 Pod has NO toleration
 
-	
+
+31. Create a Job named pi-job.
+
+Constraints
+  Image: perl
+  Command: calculate π
+  Use:  perl -Mbignum=bpi -wle 'print bpi(2000)'
+
+Ans: 
+apiVersion: batch/v1
+kind: Job 
+metadata:
+   name: pi-job 
+spec: 
+   template:
+    spec:
+	  restartPolicy: OnFailure
+      containers: 
+	   - name: perl 
+	     image: perl 
+		 command: ["perl", "-Mbignum=bpi", "-wle" , "print bpi(2000)"]
+		 
+      
+
+
+32. Create a Job that runs 5 completions.
+
+Constraints
+   Name: multi-job
+   Image: busybox
+   Command: echo hello
+   Ensure job completes 5 times
+
+Ans: 
+apiVersion: batch/v1
+kind: Job 
+metadata: 
+    name: multi-job
+spec: 
+   completions: 5 
+   template:
+     spec: 
+	    restartPolicy: OnFailure
+		
+		containers: 
+		    - name: multi-job
+			  image: busybox
+			  command: ["echo","hello"]
+
+
+33. Create a Job with parallel execution.
+
+Constraints
+   Name: parallel-job
+   Completions: 6
+   Parallelism: 3
+   Image: busybox
+   Command: sleep 10
+
+Ans: 
+apiVersion: batch/v1
+kind: Job
+metadata: 
+   name: parallel-job
+spec: 
+  completions: 6
+  parallelism: 3 
+  template:
+     spec: 
+	    restartPolicy: OnFailure 
+		containers: 
+		    - name: busybox
+			  image: busybox
+			  command: ["sleep","10"]
+			  
+
+
+34. Create a Job that retries on failure.
+
+Constraints
+  Name: retry-job
+  Image: busybox
+  Command: exit 1
+  Backoff limit: 4
+
+Ans: 
+apiVersion: batch/v1
+kind: Job
+metadata: 
+    name: retry-job
+spec: 
+   backoffLimit: 4 
+   template: 
+       spec: 
+	      restartPolicy: Never
+		  containers: 
+		     - name: busybox
+			   image: busybox
+			   command: ["exit","1"]
+			   
+
+
+35. Create a Job that automatically deletes after completion.
+
+Constraints
+  Name: cleanup-job
+  TTL: 30 seconds
+  Image: busybox
+  Command: echo done
+
+Ans: 
+apiVersion: batch/v1
+kind: Job
+metadata: 
+    name: cleanup-job
+spec: 
+   ttlSecondsAfterFinished: 30 
+   template: 
+       spec: 
+	      restartPolicy: Never
+		  containers: 
+		     - name: busybox
+			   image: busybox
+			   command: ["echo","done"]
 

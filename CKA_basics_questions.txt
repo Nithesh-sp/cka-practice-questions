@@ -768,3 +768,130 @@ spec:
 			   image: busybox
 			   command: ["echo","done"]
 
+36. Create a CronJob that runs every minute.
+
+Constraints
+  Name: minute-job
+  Schedule: * * * * *
+  Image: busybox
+  Command: date
+
+Ans: 
+apiVersion: batch/v1
+kind: CronJob
+metadata: 
+   name: minute-job 
+spec: 
+   schedule: "* * * * *"
+   jobTemplate: 
+    spec: 
+      template: 
+         spec: 
+    	     restartPolicy: Never
+    	     containers: 
+    		     - name: busybox
+    			   image: busybox 
+    			   command: ["date"]
+
+
+37. Create a CronJob that runs every day at 2 AM.
+
+Constraints
+Name: daily-job
+Schedule: 0 2 * * *
+Image: busybox
+Command: echo daily
+
+Ans: 
+apiVersion: batch/v1 
+kind: CronJob 
+metadata: 
+    name: daily-job 
+spec: 
+   schedule: "0 2 * * *"
+   jobTemplate: 
+      spec: 
+	     template: 
+		    spec: 
+			  restartPolicy: Never  
+			  containers: 
+			      - name: busybox 
+				    image: busybox
+					command: ["echo","daily"]
+
+
+38. Prevent concurrent runs in CronJob.
+
+Constraints
+  Name: safe-job
+  Schedule: every minute
+  Concurrency policy: Forbid
+
+Ans: 
+apiVersion: batch/v1
+kind: CronJob
+metadata: 
+    name: safe-job
+spec: 
+    schedule: "* * * * *"
+	concurrencyPolicy: "Forbid"
+	jobTemplate: 
+	    spec: 
+		   template: 
+		      spec: 
+			    restartPolicy: Never
+			    containers: 
+				   - name: busybox
+				     image: busybox
+					 command: ["echo","Done"]
+
+39. Limit history of successful jobs.
+
+Constraints
+  Name: history-job
+  Keep only last 2 successful jobs
+  Schedule: every minute
+
+Ans: 
+apiVersion: batch/v1
+kind: CronJob
+metadata: 
+    name: history-job
+spec: 
+    schedule: "* * * * *"
+	successfulJobHistoryLimit: 2
+	jobTemplate: 
+	    spec: 
+		   template: 
+		      spec: 
+			    restartPolicy: Never
+			    containers: 
+				- name: busybox
+				  image: busybox
+				  command: ["echo","Done"]
+
+
+40. Suspend a CronJob.
+
+Constraints
+  Name: suspend-job
+  Schedule: every minute
+  Should NOT run automatically
+
+Ans: 
+apiVersion: batch/v1
+kind: CronJob
+metadata: 
+    name: suspend-job
+spec: 
+    schedule: "* * * * *"
+	suspend: true
+	jobTemplate: 
+	    spec: 
+		   template: 
+		      spec: 
+			    restartPolicy: Never
+			    containers: 
+				- name: busybox
+				  image: busybox
+				  command: ["echo","Done"]

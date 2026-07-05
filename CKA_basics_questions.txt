@@ -1114,3 +1114,71 @@ Use cases
    Passwords
    API keys
    TLS certificates
+
+
+51. Create a PersistentVolume named pv-volume.
+
+Constraints
+  Capacity: 1Gi
+  AccessMode: ReadWriteOnce
+  Volume type: hostPath
+  Path: /data
+Ans: 
+apiVersion: v1 
+kind: PersistentVolume
+metadata: 
+   name: pv-volume
+spec: 
+   capacity: 
+      storage: 1Gi
+   accessMode: 
+       - ReadWriteOnce
+   hostPath: 
+      path: /data  
+  
+  
+52. Create a PV with reclaim policy.
+
+Constraints
+  Name: pv-retain
+  Storage: 2Gi
+  AccessMode: ReadWriteMany
+  ReclaimPolicy: Retain
+  hostPath: /mnt/data
+
+Ans: 
+apiVersion: v1 
+kind: PersistentVolume
+metadata: 
+   name: pv-retain
+spec: 
+   capacity: 
+      storage: 2Gi 
+   accessModes: 
+       - ReadWriteMany
+   persistentVolumeReclaimPolicy: Retain 
+   hostPath: 
+      path: /mnt/data
+
+53. Create a PV with specific storage class.
+
+Constraints
+  Name: pv-sc
+  Storage: 5Gi
+  AccessMode: ReadWriteOnce
+  storageClassName: manual
+  Path: /opt/data
+  
+Ans: 
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-sc
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: manual
+  hostPath:
+    path: /opt/data

@@ -895,3 +895,117 @@ spec:
 				- name: busybox
 				  image: busybox
 				  command: ["echo","Done"]
+
+
+41. Create a ConfigMap named app-config.
+
+Constraints
+  Key: APP_COLOR
+  Value: blue
+  Use imperative command
+Ans: 
+apiVersion: v1 
+kind: ConfigMap 
+metadata: 
+    name: app-config 
+data: 
+    APP_COLOR: blue 
+	
+kubectl create cm app-config --from-literal=APP_COLOR=blue 
+
+
+
+
+
+42. Create a Pod that uses ConfigMap as environment variables.
+
+Constraints
+  Pod name: env-pod
+  Image: nginx
+  Use ConfigMap: app-config
+  Load all keys as env
+Ans: 
+apiVersion: v1 
+kind: Pod
+metadata: 
+   name: env-pod
+spec: 
+   containers: 
+       - name: nginx 
+	     image: nginx
+		 envFrom: 
+	     - configMapRef: 
+		       name: app-config
+		 
+
+
+43. Mount ConfigMap as a volume.
+
+Constraints
+  Pod name: volume-pod
+  Image: nginx
+  Mount path: /etc/config
+  ConfigMap: app-config
+
+Ans: 
+apiVersion: v1 
+kind: Pod 
+metadata: 
+   name: volume-pod
+spec: 
+   containers: 
+      - name: nginx
+        image: nginx
+        volumesMounts: 
+           - name: config_vol
+		     mountPath: /etc/config
+
+   volumes: 
+      - name: config_vol
+        configMap: 
+            name: app-config		
+  
+44. Create ConfigMap from file.
+  
+Constraints  
+  File: config.txt
+
+Content:
+  key1=value1  
+  key2=value2  
+  Name: file-config
+ 
+Ans: 
+apiVersion: v1 
+kind: ConfigMap 
+metadata: 
+    name: file-config
+data: 
+  config.txt: | 
+   key1=value1  
+   key2=value2
+
+kubectl create cm file-config --from-file=config.txt 
+  
+45. Use specific key from ConfigMap.
+
+Constraints
+  Pod name: key-pod
+  Use only APP_COLOR
+  Expose as env variable COLOR
+  
+Ans: 
+apiVersion: v1 
+kind: Pod 
+metadata: 
+   name: key-pod 
+spec: 
+  containers: 
+      - name: nginx 
+	    image: nginx
+		env: 
+		  - name: COLOR 
+		    valueFrom: 
+			  configMapKeyRef:
+                 name: app-config			  
+			     key: APP_COLOR

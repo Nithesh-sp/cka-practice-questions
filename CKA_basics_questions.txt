@@ -1259,4 +1259,69 @@ Ans: PVC won't bind , it will be in pending state untill it find the PV
 	 > accessModes must match 
 	 > PV's storage >= PVC request 
 
+58. Create a StorageClass.
+
+Constraints
+  Name: fast-storage
+  Provisioner: kubernetes.io/no-provisioner
+  VolumeBindingMode: WaitForFirstConsumer
+Ans: 
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata: 
+    name: fast-storage
+spec:
+  provisioner: kubernetes.io/no-provisioner
+  volumeBindingMode: WaitForFirstConsumer
+  
+
+
+
+
+59. Create PVC using dynamic provisioning.
+
+Constraints
+  Name: dynamic-pvc
+  Storage: 1Gi
+  AccessMode: ReadWriteOnce
+  storageClassName: fast-storage
+Ans: 
+apiVersion: v1 
+kind: PersistentVolumeClaim
+metadata: 
+    name: dynamic-pvc
+spec: 
+    accessModes: 
+         - ReadWriteOnce 
+    resources:  
+       requests:
+         storage: 1Gi 
+    storageClassName: fast-storage		 
+  
+  
+10. TASK
+
+Explain reclaim policy.
+
+Question
+
+👉 Difference between:
+
+Retain         
+    When PVC is deleted:
+
+     PV is NOT deleted
+     Data is preserved
+     PV becomes Released (not reusable automatically) 
+Delete
+    When PVC is deleted:
+
+     PV is automatically deleted
+     Underlying storage (disk) is also deleted
+Recycle (if you know)
+    When PVC is deleted:
+
+     Data is wiped (rm -rf)
+     PV becomes Available again
+
 

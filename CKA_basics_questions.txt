@@ -1182,3 +1182,81 @@ spec:
   storageClassName: manual
   hostPath:
     path: /opt/data
+
+54. Create a PVC named pvc-claim.
+
+Constraints
+  Request: 1Gi
+  AccessMode: ReadWriteOnce
+ 
+Ans: 
+apiVersion: v1 
+kind: PersistentVolumeClaim
+metadata: 
+   name: pvc-claim
+spec: 
+   accessModes: 
+      - ReadWriteOnce 
+   resoueces:
+       requests: 
+	      storage: 1Gi 
+   
+
+55. Bind PVC to specific storage class.
+
+Constraints
+  Name: pvc-sc
+  Storage: 2Gi
+  AccessMode: ReadWriteOnce
+  storageClassName: manual
+Ans: 
+apiVersion: v1 
+kind: PersistentVolumeClaim
+metadata: 
+     name: pvc-sc
+spec: 
+    resources: 
+	   requests:  
+	      storage: 2Gi 
+	accessModes: 
+	   - ReadWriteOnce
+	storageClassName: manual 
+
+
+56. Use PVC in a Pod.
+
+Constraints
+  Pod name: pvc-pod
+  Image: nginx
+  Mount path: /usr/share/nginx/html
+  Use PVC: pvc-claim
+Ans:
+apiVersion: v1 
+kind: Pod
+metadata: 
+   name: pvc-pod
+spec: 
+   containers: 
+       - name: nginx
+         image: nginx
+         volumeMounts: 
+           - name: pvc-volume 
+             mountPath: /usr/share/nginx/html
+   volumes: 
+     - name: pvc-volume
+       persistentVolumeClaim:
+           claimName: pvc-claim	   
+
+
+
+57. Explain binding behavior.
+
+Question
+What happens if PVC requests 10Gi but PV is only 5Gi?
+
+Ans: PVC won't bind , it will be in pending state untill it find the PV 
+     > storageClassName must match if mentioned 
+	 > accessModes must match 
+	 > PV's storage >= PVC request 
+
+

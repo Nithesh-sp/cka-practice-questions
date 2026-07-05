@@ -1009,3 +1009,108 @@ spec:
 			  configMapKeyRef:
                  name: app-config			  
 			     key: APP_COLOR
+
+46. Create a Secret using imperative.
+
+Constraints
+  Name: db-secret
+  Key: password
+  Value: admin123
+
+Ans: 
+kubectl create secret generic db-secret --from-literal=password=admin123
+
+
+
+47. Create a Pod that uses Secret as environment variable.
+
+Constraints
+  Pod name: secret-pod
+  Image: nginx
+  Use Secret: db-secret
+Ans: 
+apiVersion: v1 
+kind: Pod 
+metadata: 
+   name: secret-pod
+spec: 
+  containers: 
+   - name: nginx
+     image: nginx 
+     env: 
+	  - name: PASSWORD 
+        valueFrom: 
+           secretKeyRef: 
+           	 name: db-secret
+			 key: password
+
+48. Mount Secret as volume.
+
+Constraints
+  Pod name: secret-volume-pod
+  Mount path: /etc/secret
+  Secret: db-secret
+Ans: 
+apiVersion: v1
+kind: Pod
+metadata: 
+   name: secret-volume-pod 
+spec: 
+   containers: 
+      - name: nginx
+	    image: nginx
+		volumeMounts: 
+		   - name: secret-volume
+		     mountPath: /etc/secret
+   volumes: 
+      - name: secret-volume
+	    secret: 
+		   secretName: db-secret
+
+
+49. Create Secret using YAML.
+
+Constraints
+  Name: api-secret
+  Key: token
+  Value: mytoken123
+  Value must be base64 encoded
+
+Ans: 
+apiVersion: v1 
+kind: Secret 
+metadata: 
+   name: api-secret 
+type: Opaque 
+data: 
+   token: bXl0b2tlbjEyMw
+
+
+
+50. Explain difference.
+
+Question
+
+👉 ConfigMap vs Secret
+
+Storage
+Encoding
+Use cases
+
+
+🔹 ConfigMap vs Secret
+1. Storage
+   ConfigMap → stores non-sensitive data in plain text
+   Secret → stores sensitive data (credentials, tokens, keys)
+2. Encoding
+   ConfigMap → plain text (no encoding)
+   Secret → base64 encoded (not encrypted by default)
+3. Use Cases
+ ConfigMap
+   Application configuration
+   Environment variables
+   Config files
+ Secret
+   Passwords
+   API keys
+   TLS certificates

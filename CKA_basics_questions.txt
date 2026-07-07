@@ -1300,7 +1300,7 @@ spec:
     storageClassName: fast-storage		 
   
   
-10. TASK
+60. TASK
 
 Explain reclaim policy.
 

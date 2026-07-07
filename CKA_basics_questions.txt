@@ -1325,4 +1325,107 @@ Recycle (if you know)
      Data is wiped (rm -rf)
      PV becomes Available again
 
+61. Create a Service named nginx-svc.
+
+Constraints
+  Type: ClusterIP
+  Port: 80
+  TargetPort: 80
+  Selector: app=nginx
+Ans: 
+apiVersion: v1 
+kind: Service 
+metadata: 
+    name: nginx-svc 
+spec: 
+    type: ClusterIP
+	selector: 
+	     app: nginx 
+	ports:
+	  - port: 80 
+	    targetPort: 80 
+
+
+
+62. Expose an application using NodePort.
+
+Constraints
+  Name: node-svc
+  Type: NodePort
+  Port: 80
+  TargetPort: 80
+  NodePort: 30007
+  Selector: app=web
+Ans: 
+apiVersion: v1 
+kind: Service 
+metadata: 
+   name: node-svc
+spec: 
+   type: NodePort 
+   selector: 
+      app: web 
+   ports: 
+      - port: 80 
+	    targetPort: 80 
+		nodePort: 30007 
+
+
+
+63. Expose an existing Deployment.
+
+Constraints
+   Deployment: nginx-deploy
+   Service name: deploy-svc
+   Port: 80
+   Type: ClusterIP
+   Use imperative command
+Ans: 
+kubectl expose deployment nginx-deploy --port=80 --target-port=80 --type=ClusterIP --name=deploy-svc
+
+
+64. Create a Service exposing multiple ports.
+
+Constraints
+  Name: multi-svc
+  Selector: app=multi
+  Ports:
+  Port 80 → TargetPort 80
+  Port 443 → TargetPort 443
+Ans: 
+apiVersion: v1
+kind: Service 
+metadata: 
+   name: multi-svc
+spec: 
+   type: ClusterIP
+   selector: 
+     app: multi
+   ports: 
+   - port: 80 
+     targetPort: 80 
+   - port: 443
+     targetPort: 443 
+
+
+65. Create a headless Service.
+
+Constraints
+  Name: headless-svc
+  Selector: app=state
+  Port: 80
+  No cluster IP
+
+Ans: 
+apiVersion: v1 
+kind: Service 
+metadata: 
+   name: headless-svc
+spec: 
+   clusterIP: none
+   selector: 
+     app: state
+   ports: 
+   - port: 80 
+     targetPort: 80 
 

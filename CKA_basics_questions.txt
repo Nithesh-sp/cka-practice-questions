@@ -1429,3 +1429,118 @@ spec:
    - port: 80 
      targetPort: 80 
 
+
+Constraints
+  Service: nginx-svc
+  Port: 80
+  Path: /
+  PathType: Prefix
+  
+Ans: 
+apiVersion: networking.k8s.io/v1 
+kind: Ingress
+metadata: 
+   name: basic-ing
+spec: 
+   rules: 
+     - http:
+	     paths: 
+		 - path: /
+		   pathType: Prefix
+		   backend: 
+		      service: 
+			    name: nginx-svc
+				port: 
+				 - number: 80 
+			  
+
+
+67. Create Ingress with hostname.
+
+Constraints
+  Name: host-ing
+  Host: example.com
+  Path: /
+  Service: nginx-svc
+  Port: 80
+
+Ans: 
+apiVersion: networking.k8s.io/v1 
+kind: Ingress 
+metadata: 
+   name: nginx-ing
+spec:
+   rules: 
+     - host: example.com 
+	   http: 
+	     paths: 
+		 - path: /
+		   pathType: Prefix 
+		   backend: 
+			 service: 
+			    name: nginx-svc
+				port: 
+				  number: 80
+
+
+68. Route different paths to different services.
+
+Constraints
+  Name: multi-ing
+  /app1 → svc1 (port 80)
+  /app2 → svc2 (port 80)
+
+Ans: 
+apiVersion: networking.k8s.io/v1 
+kind: Ingress
+metadata: 
+   name: multi-ing
+spec: 
+   rules: 
+    - http: 
+	   paths: 
+	     - path: /app1 
+           pathType: Prefix
+           backend: 
+             service: 
+                name: svc1
+                port: 
+                 number: 80
+         - path: /app2 
+           pathType: Prefix
+           backend: 
+             service: 
+                name: svc2
+                port: 
+                  number: 80				
+
+
+69. Create Ingress with rewrite rule.
+
+Constraints
+   Name: rewrite-ing
+   Path: /app
+   Service: nginx-svc
+   Port: 80
+   Add annotation to rewrite to /
+
+👉 (Hint: nginx ingress annotation)
+
+Ans: 
+apiVersion: networking.k8s.io/v1 
+kind: Ingress
+metadata: 
+    name: rewrite-ing
+	annotations: 
+	   nginx.ingress.kubernetes.io/rewrite-target: /
+spec: 
+    rules: 
+	  - http: 
+	      paths:
+		     - path: /app 
+			   pathType: Prefix 
+			   backend: 
+			     service:
+				    name: nginx-svc
+					port:
+					 number: 80

@@ -75,3 +75,56 @@ spec:
 >> kubectl exec -it pod/config-pod -- env | grep LOG_LEVEL
 >> kubectl exec -it pod/config-pod -- env | grep ENV
 
+TASK 3 – PVC + Pod + Data Persistence
+
+App needs persistent storage.
+
+Requirements
+  Create PVC data-pvc
+  Size: 1Gi
+  AccessMode: ReadWriteOnce
+  Create Pod data-pod
+  Image: busybox
+  Command: sleep 3600
+  Mount PVC at /data
+  Exec into pod and create a file /data/test.txt
+  Delete pod and recreate it
+  Verify data still exists
+  
+Ans:
+apiVersion: v1 
+kind: PersistentVolumeClaim
+metadata: 
+   name: data-pvc
+spec: 
+   accessModes: 
+   - ReadWriteOnce 
+   resources:
+      requests: 
+	    storage: 1Gi 
+---
+apiVersion: v1 
+kind: Pod 
+metadata: 
+   name: data-pod
+spec: 
+   containers: 
+   - name: busybox
+     image: busybox
+     command: ["sleep","3600"]
+     volumeMounts: 
+     - name: persistent_vol
+	   mountPath: /data 
+   volumes: 
+   - name: persistent_vol
+	 persistentVolumeClaim:
+	  claimName: data-pvc 
+
+>> kubectl apply -f data-pod.yaml
+>> kubectl exec -it data-pod -- touch /data/test.txt
+>> kubectl delete pod data-pod 
+>> kubectl apply -f data-pod.yaml 
+>> kubectl exec -it data-pod -- ls /data/test.txt
+
+
+   

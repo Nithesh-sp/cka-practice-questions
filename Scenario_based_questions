@@ -1,0 +1,48 @@
+TASK 1 – App Exposure + Scaling
+
+Scenario
+
+You have a deployment running a web app but it's not accessible.
+
+Requirements
+  Create a Deployment web-deploy
+  Image: nginx:1.25
+  Replicas: 2
+  Label: app=web
+  Expose it using a Service web-svc
+  Type: NodePort
+  Port: 80
+  NodePort: 30008
+  Scale deployment to 5 replicas
+  Verify rollout status
+
+Ans: 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-deploy
+  labels:
+    app: web
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.25
+        ports:
+        - containerPort: 80
+		
+>> kubectl expose deployment web-deploy --type=NodePort --labels=app=web --port=80 --target-port=80 --node-port=30008 --name=web-svc
+
+>> kubectl scale deployment web-deploy --replicas=5
+
+>> kubectl rollout status deployment web-deploy
+
+

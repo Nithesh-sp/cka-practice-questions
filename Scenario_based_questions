@@ -1,7 +1,5 @@
 TASK 1 – App Exposure + Scaling
 
-Scenario
-
 You have a deployment running a web app but it's not accessible.
 
 Requirements
@@ -40,9 +38,40 @@ spec:
         - containerPort: 80
 		
 >> kubectl expose deployment web-deploy --type=NodePort --labels=app=web --port=80 --target-port=80 --node-port=30008 --name=web-svc
-
 >> kubectl scale deployment web-deploy --replicas=5
-
 >> kubectl rollout status deployment web-deploy
 
+
+TASK 2 – ConfigMap + Pod Integration
+
+Application needs environment configuration.
+
+Requirements
+  Create ConfigMap app-config
+  ENV=prod
+  LOG_LEVEL=debug
+  Create Pod config-pod
+  Image: nginx
+  Inject all ConfigMap values as environment variables
+  Verify inside pod (command)
+
+Ans: 
+kubectl create configmap app-config --from-literal=ENV=prod --from-literal=LOG_LEVEL=debug
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: config-pod
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    ports:
+    - containerPort: 80
+	envFrom: 
+	- configMapRef: 
+	   name: app-config
+
+>> kubectl exec -it pod/config-pod -- env | grep LOG_LEVEL
+>> kubectl exec -it pod/config-pod -- env | grep ENV
 

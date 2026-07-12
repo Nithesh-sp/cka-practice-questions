@@ -170,4 +170,41 @@ spec:
             port:
               number: 80
 
+TASK 5 – Taints + Scheduling Control
+
+You want to restrict workloads to specific nodes.
+
+Requirements
+  Taint node:
+  Node: node1
+  Key: env
+  Value: prod
+  Effect: NoSchedule
+  Create Pod restricted-pod
+  Image: nginx
+  Should be scheduled on tainted node
+  Verify scheduling
+  
+Ans: 
+
+kubectl taint nodes node1 env=prod:NoSchedule
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restricted-pod
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+  tolerations:
+  - key: "env"
+    value: "prod"
+    operator: "Equal"
+    effect: "NoSchedule"
+	
+kubectl apply -f pod.yaml
+		
+kubectl describe nodes node1 
+kubectl describe pod restricted-pod
    

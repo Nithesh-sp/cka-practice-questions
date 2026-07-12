@@ -126,5 +126,48 @@ spec:
 >> kubectl apply -f data-pod.yaml 
 >> kubectl exec -it data-pod -- ls /data/test.txt
 
+TASK 4 – Ingress Routing
+
+Two services need routing via Ingress.
+
+Requirements
+  Create 2 Deployments:
+  app1 → image nginx
+  app2 → image httpd
+  Expose both as ClusterIP:
+  svc1, svc2
+  Create Ingress app-ing
+  /app1 → svc1
+  /app2 → svc2
+  
+Ans: 
+>> kubectl create deployment app1 --replicas=3 --image=nginx 
+>> kubectl create deployment app2 --replicas=3 --image=httpd 
+
+>> kubectl expose deployment/app1 --port=80 --target-port=80 --name=svc1 
+>> kubectl expose deployment/app2 --port=80 --target-port=80 --name=svc2	
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: app-ing
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /app1
+        pathType: Prefix
+        backend:
+          service:
+            name: svc1 
+            port:
+              number: 80
+	  - path: /app2
+        pathType: Prefix
+        backend:
+          service:
+            name: svc2 
+            port:
+              number: 80
 
    
